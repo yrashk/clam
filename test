@@ -1,0 +1,49 @@
+#! /usr/bin/env bash
+
+case "$1" in
+        ""|test)
+        mdcat=$(which mdcat 2>/dev/null)
+        tcc=$(which tcc 2>/dev/null)
+        cc=$(which cc 2>/dev/null)
+        tput=$(which tput 2>/dev/null)
+        if [ -z "${tput}" ]; then
+                bell=true
+        else
+                bell="${tput} bel"
+        fi
+        if [ -z "${tcc}" ] && [ -z "${cc}" ]; then
+                echo "Neither tcc nor cc found, exiting"
+                exit 1
+        fi
+        if [ -z "${mdcat}" ]; then
+                echo "Warning: mdcat not found, the results won't be pretty-printed"
+                trailer=""
+        else
+                trailer="| ${mdcat}"
+        fi
+        results=$(mktemp)
+        if [ -z "${tcc}" ]; then
+                file=$(mktemp)
+                "${cc}" tests.c -o "${file}" 
+                "${file}" > "${results}" 
+                ring=$?
+                rm -f "${file}"
+        else
+                "${tcc}" -run tests.c > "${results}"
+                ring=$?
+        fi
+        if [ $ring -gt 0 ]; then
+                eval ${bell}
+        fi
+        eval "cat \"${results}\" $trailer"
+        rm -f "${results}"
+        ;;
+        wp)
+        framac=$(which frama-c 2>/dev/null)
+        if [ -z "${framac}" ]; then
+                echo "frama-c is not found, exiting"
+                exit 1
+        fi
+        shift
+        eval "${framac} -wp -wp-rte -wp-literals clam.h $@"
+esac

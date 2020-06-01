@@ -1,0 +1,8 @@
+project(clam)
+cmake_minimum_required(VERSION 3.17)
+add_library(clam INTERFACE)
+target_include_directories(clam INTERFACE .)
+add_executable(tests tests.c)
+target_link_libraries(tests clam)
+add_executable(example example.c)
+target_link_libraries(example clam)
