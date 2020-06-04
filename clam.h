@@ -203,8 +203,14 @@ CLAM_API clam_match_result_t
   @ requires valid_read_string(input);
   @ assigns \nothing;
   @ ensures \result \in (0..1);
-  @ ensures \result == 1 ==> input[0] == 0;
-  @ ensures \result == 0 ==> input[0] != 0;
+  @ behavior empty:
+  @   assumes strlen(input) == 0;
+  @   ensures \result == 1;
+  @ behavior nonempty:
+  @   assumes strlen(input) > 0;
+  @   ensures \result == 0;
+  @ complete behaviors;
+  @ disjoint behaviors;
   @*/
 CLAM_API clam_match_result_t
          clam_match_end(
@@ -227,12 +233,17 @@ CLAM_API clam_match_result_t
   @ requires valid_read_string(input);
   @ assigns \nothing;
   @ ensures \result \in (0..1);
+  @ behavior empty:
+  @   assumes chars != \null;
+  @   assumes strlen(input) == 0;
+  @   ensures \result == 0;
   @ behavior no_chars:
   @   assumes chars == \null;
   @   ensures \result == 1 ==> strlen(input) > 0;
   @   ensures \result == 0 ==> strlen(input) == 0;
   @ behavior chars:
   @   assumes chars != \null;
+  @   assumes strlen(input) > 0;
   @   requires valid_read_string(chars);
   @   ensures \result == 1 ==> \exists integer i;
   @                            0 <= i < strlen(chars) ==>
@@ -499,9 +510,6 @@ CLAM_API clam_match_result_t
            const char * restrict input
          )
 {
-         if (clam_match_end(input)) {
-                 return 0;
-         };
          clam_match_result_t sign = clam_match_anychar(input, clam__signs);
 
          clam_match_result_t number = clam_match_unsigned_integer10(input + sign);
