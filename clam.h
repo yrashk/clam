@@ -50,8 +50,8 @@
  *
  * "Blackbox"-style libraries are effectively runtime interpreters of
  * table-based programs (lists of options) which leads to indirect code path.
- * CLAM makes command line arguments processing straighforward, easy to follow
- * and inifinitely customizable.
+ * CLAM makes command line arguments processing straightforward, easy to follow
+ * and infinitely customizable.
  *
  * ## License
  *
