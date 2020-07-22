@@ -135,6 +135,29 @@
 #define CLAM_API static inline
 #endif
 
+/*@
+  @ axiomatic StrlenAxioms {
+  @
+  @   // Axiomatize the following fact:
+  @   // Length of any valid string is less or equal to UINTPTR_MAX.
+  @   //
+  @   // What's the largest valid string we can imagine? Let's assume it starts
+  @   // at the offset of `0` and takes all addressable memory.
+  @   //
+  @   // Let's  also assume UINTPTR_MAX to be 8 (because why not?).
+  @   //
+  @   // c c c c c c c c 0
+  @   // _ _ _ _ _ _ _ _ _
+  @   // 0 1 2 3 4 5 6 7 8
+  @   //
+  @   // As we can visually confirm, the maximum length of the string in this case is 8
+  @   // (which is our UINTPTR_MAX)..
+  @   //
+  @   axiom strlen_less_or_equal_uintptr_max:
+  @     \forall char *s; strlen(s) <= UINTPTR_MAX;
+  @ }
+  @*/
+
 /**
  * \defgroup matchers Matchers
  *
@@ -311,8 +334,7 @@ CLAM_API clam_match_result_t
            @ loop invariant \forall integer j; 0 <= j < i ==> input[j] == chars[j];
            @ loop assigns i;
            @*/
-         while (i < UINTPTR_MAX &&
-                !clam_match_end(input + i) && !clam_match_end(chars + i) &&
+         while (!clam_match_end(input + i) && !clam_match_end(chars + i) &&
                 clam_match_char(input + i, chars[i])) {
                  i++;
          }
@@ -326,7 +348,6 @@ CLAM_API clam_match_result_t
 /*@
   @ requires valid_read_string(input);
   @ requires valid_read_string(chars);
-  @ requires strlen(chars) < UINTPTR_MAX;
   @ ensures \result == 0 || \result == strlen(chars);
   @ assigns \nothing;
   @ behavior no_chars:
@@ -358,8 +379,7 @@ CLAM_API clam_match_result_t
            @ loop invariant \forall integer j; 0 <= j < i ==> input[j] == chars[j];
            @ loop assigns i;
            @*/
-         while (i < UINTPTR_MAX &&
-                !clam_match_end(input + i) && !clam_match_end(chars + i) &&
+         while (!clam_match_end(input + i) && !clam_match_end(chars + i) &&
                 clam_match_char(input + i, chars[i])) {
                  i++;
          }
@@ -373,7 +393,6 @@ CLAM_API clam_match_result_t
 /*@
   @ requires valid_read_string(input);
   @ requires valid_read_string(chars);
-  @ requires strlen(chars) < UINTPTR_MAX;
   @ assigns \nothing;
   @ ensures \result == 0 || \result == strlen(chars);
   @ behavior no_chars:
@@ -471,7 +490,7 @@ CLAM_API clam_match_result_t
           @ loop invariant 0 <= i <= strlen(input);
           @ loop invariant \forall integer j; 0 <= j < i ==> is_numeric10_char(input[j]);
           @*/
-        while (i < UINTPTR_MAX && clam_match_numeric10_char(input + i)) {
+        while (clam_match_numeric10_char(input + i)) {
                 i++;
         }
         return i;
@@ -670,7 +689,6 @@ CLAM_API clam_match_result_t
 /*@
   @ requires valid_read_string(input);
   @ requires valid_read_string(option);
-  @ requires strlen(option) < UINTPTR_MAX;
   @ assigns \nothing;
   @ ensures \result == 0 || \result == strlen(option) + 1;
   @ ensures \result > 0 ==> input[0] == '-';
@@ -728,7 +746,7 @@ CLAM_API clam_match_result_t
            @ loop invariant 0 <= i <= strlen(input);
            @ loop assigns i;
            @*/
-         while (i < UINTPTR_MAX && !clam_match_end(input + i)) {
+         while (!clam_match_end(input + i)) {
                  if (!(clam_match_alphanumeric_char(input + i) &&
                        clam_match_anychar(input + i, allowed_options))) {
                          return 0;
@@ -800,7 +818,6 @@ CLAM_API clam_match_result_t
 /*@
   @ requires valid_read_string(input);
   @ requires valid_read_string(switch_s);
-  @ requires strlen(switch_s) < UINTPTR_MAX;
   @ assigns \nothing;
   @ ensures \result == 0 || \result == strlen(switch_s) + 1;
   @ ensures \result > 0 ==> input[0] == '/';
