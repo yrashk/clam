@@ -257,13 +257,12 @@ CLAM_API clam_match_result_t
   @ assigns \nothing;
   @ ensures \result \in (0..1);
   @ behavior empty:
-  @   assumes chars != \null;
   @   assumes strlen(input) == 0;
   @   ensures \result == 0;
   @ behavior no_chars:
   @   assumes chars == \null;
-  @   ensures \result == 1 ==> strlen(input) > 0;
-  @   ensures \result == 0 ==> strlen(input) == 0;
+  @   assumes strlen(input) > 0;
+  @   ensures \result == 1;
   @ behavior chars:
   @   assumes chars != \null;
   @   assumes strlen(input) > 0;
@@ -289,7 +288,24 @@ CLAM_API clam_match_result_t
          } else if (chars == NULL) {
                  return 1;
          } else {
-                 return strchr(chars, input[0]) != NULL;
+                 clam_match_result_t i = 0;
+                 clam_match_result_t result = 0;
+                 /*@
+                   @ loop invariant 0 <= i <= strlen(chars);
+                   @ loop invariant \forall integer j; 0 <= j < i ==> input[0] != chars[j];
+                   @ loop invariant result \in (0..1);
+                   @ loop assigns i, result;
+                   @*/
+                 while (!result &&
+                        !clam_match_end(chars + i)) {
+                        result = clam_match_char(input, chars[i]);
+                        if (result) {
+                                break;
+                        }
+                        i++;
+                 }
+
+                 return result;
          }
 }
 
