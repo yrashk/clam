@@ -512,12 +512,13 @@ CLAM_API clam_match_result_t
         return i;
 }
 
+const char clam__signs[3] = "-+"; // FRAMA-WP-SL
+
 /**
- * Matches `input` if it matches an signed base-10 integer.
+ * Matches `input` if it matches a signed base-10 integer.
  *
  * Accepts optional '-' and '+' signs.
  */
-const char clam__signs[3] = "-+"; // FRAMA-WP-SL
 /*@
   @ requires valid_read_string(input);
   @ assigns \nothing;
