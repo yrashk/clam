@@ -365,6 +365,7 @@ CLAM_API clam_match_result_t
   @ requires valid_read_string(input);
   @ requires valid_read_string(chars);
   @ ensures \result == 0 || \result == strlen(chars);
+  @ ensures \result <= strlen(input);
   @ assigns \nothing;
   @ behavior no_chars:
   @   assumes strlen(chars) == 0 || strlen(input) == 0;
@@ -425,12 +426,12 @@ CLAM_API clam_match_result_t
   @ behavior match:
   @   assumes strlen(chars) > 0;
   @   assumes strlen(input) == strlen(chars);
-  @   assumes strncmp(input, chars, strlen(chars)) == 0;
+  @   assumes strcmp(input, chars) == 0;
   @   ensures \result == strlen(chars);
   @ behavior no_match:
   @   assumes strlen(chars) > 0;
   @   assumes strlen(input) == strlen(chars);
-  @   assumes strncmp(input, chars, strlen(chars)) != 0;
+  @   assumes strcmp(input, chars) != 0;
   @   ensures \result == 0;
   @ complete behaviors;
   @ disjoint behaviors;
